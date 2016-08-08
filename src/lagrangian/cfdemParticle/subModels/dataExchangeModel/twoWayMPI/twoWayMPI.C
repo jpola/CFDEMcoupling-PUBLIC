@@ -110,7 +110,7 @@ void twoWayMPI::getData
 {
     char* charName = wordToChar(name);
     char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"double");
+    data_liggghts_to_of(charName, charType, lmp, (void*&) field, const_cast<char*>("double"));
 }
 
 void twoWayMPI::getData
@@ -123,7 +123,7 @@ void twoWayMPI::getData
 {
     char* charName = wordToChar(name);
     char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"int");
+    data_liggghts_to_of(charName,charType, lmp, (void*&) field, const_cast<char*>("int"));
 }
 
 void twoWayMPI::giveData
@@ -358,7 +358,6 @@ bool Foam::twoWayMPI::couple(int i) const
         particleCloud_.reAllocArrays();
         particleCloud_.clockM().stop("LIGGGHTS_reallocArrays");
     }
-
     return coupleNow;
 }
 

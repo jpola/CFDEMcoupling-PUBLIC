@@ -34,6 +34,7 @@ $(forceModels)/Archimedes/Archimedes.C
 $(forceModels)/ArchimedesIB/ArchimedesIB.C
 $(forceModels)/interface/interface.C
 $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
+$(forceModels)/ShirgaonkarTorqueIB/ShirgaonkarTorqueIB.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/virtualMassForce/virtualMassForce.C

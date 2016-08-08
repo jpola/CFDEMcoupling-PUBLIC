@@ -28,95 +28,84 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    cloud class managing DEM data for CFD-DEM coupling and IB representation
+    drag law for ficticious domain method calculating: sum(mu*nabla*u-laplace*p)
+    contribution from Alice Hager
+
+    * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    This force model if a modified version of the 'ShirgaonkarIB' model
+    from Hager that calculates the fluid-induced 'torques' or moments
+    on particles.
+    - K. Aycock
+
+    * - Adopted to CFDEM 3.4 + several bugfixes J. Pola
+
 
 Class
-    Foam::cfdemCloudIB derived from cfdemCloud
+    ShirgaonkarTorqueIB
 
 SourceFiles
-    cfdemCloudIB.C
-
+    ShirgaonkarTorqueIB.C
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudIB_H
-#define cfdemCloudIB_H
+#ifndef SHIRGAONKARTORQUEIB_H
+#define SHIRGAONKARTORQUEIB_H
 
-#include "cfdemCloud.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "forceModel.H"
 
 namespace Foam
 {
-
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudIB Declaration
+                    Class ShirgaonkarTorqueIB Declaration
 \*---------------------------------------------------------------------------*/
-
-class cfdemCloudIB
+class ShirgaonkarTorqueIB
 :
-    public cfdemCloud
+        public forceModel
 {
-protected:
 
-    mutable double **angularVelocities_;
-    mutable double **DEMTorques_;
-    label pRefCell_;
-    scalar pRefValue_;
-    
-    mutable bool haveEvolvedOnce_;
-    mutable bool skipLagrangeToEulerMapping_;
+private:
+    // Private Member Functions
+    dictionary propsDict_;
+
+    bool twoDimensional_;
+
+    bool depth_;
+
+    word velFieldName_;
+
+    const volVectorField& U_;
+
+    word pressureFieldName_;
+
+    const volScalarField& p_;
 
 public:
 
-    // Constructors
+    //- Runtime type information
+    TypeName("ShirgaonkarTorqueIB")
 
-        //- Construct from components
-        cfdemCloudIB
-        (
-            const fvMesh& mesh
-        );
+    // Constructors
+    ShirgaonkarTorqueIB
+    (
+        const dictionary& dict,
+        cfdemCloud& sm
+    );
+
+    // Selectors
 
     // Destructor
 
-        ~cfdemCloudIB();
-
+    ~ShirgaonkarTorqueIB();
 
     // Member Functions
-        void getDEMdata();
 
-        void giveDEMdata();
-
-        bool reAllocArrays() const;
-    
-        bool evolve(volScalarField&);
-
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&);
-
-        virtual void setParticleVelocity(volVectorField&);
-
-        void setForces();
-
-      // Access
-        vector angularVelocity(int);
-
-        inline double ** angularVelocities() const
-        {
-            return angularVelocities_;
-        }
-
-        inline double **DEMTorques() const
-        {
-            return DEMTorques_;
-        }
+    void setForce() const;
 };
 
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
-
 // ************************************************************************* //

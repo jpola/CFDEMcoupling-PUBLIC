@@ -118,4 +118,10 @@ doc/Doxygen/DTAGS
 # ignore log_* files
 log_*
 
+*.files
+*.config
+*.creator
+*.includes
+
 # end-of-file
+

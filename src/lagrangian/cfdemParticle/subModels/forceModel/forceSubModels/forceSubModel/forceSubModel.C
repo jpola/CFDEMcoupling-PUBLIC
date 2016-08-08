@@ -120,6 +120,7 @@ forceSubModel::forceSubModel
     verboseDiskIntervall_(1),
     verboseDiskCounter_(0)
 {
+    Info << "\n\n\nDict: " << dict_ << endl;
     // init standard switch list
     int iCounter(0);
     switchesNameList_[iCounter]="treatForceExplicit"; iCounter++;   //0 - will treat force explicity (based on slip velocity)

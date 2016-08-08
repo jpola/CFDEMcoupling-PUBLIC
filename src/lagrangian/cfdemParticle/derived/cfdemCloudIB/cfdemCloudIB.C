@@ -56,6 +56,7 @@ cfdemCloudIB::cfdemCloudIB
 :
     cfdemCloud(mesh),
     angularVelocities_(NULL),
+    DEMTorques_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
     haveEvolvedOnce_(false),
@@ -75,6 +76,7 @@ cfdemCloudIB::cfdemCloudIB
 cfdemCloudIB::~cfdemCloudIB()
 {
     dataExchangeM().destroy(angularVelocities_,3);
+    dataExchangeM().destroy(DEMTorques_, 3);
     dataExchangeM().destroy(dragPrev_,3);
 }
 
@@ -86,13 +88,25 @@ void Foam::cfdemCloudIB::getDEMdata()
     dataExchangeM().getData("omega","vector-atom",angularVelocities_);
 }
 
+void Foam::cfdemCloudIB::giveDEMdata()
+{
+    cfdemCloud::giveDEMdata();
+    dataExchangeM().giveData("hdtorque", "vector-atom", DEMTorques_);
+}
+
 bool Foam::cfdemCloudIB::reAllocArrays() const
 {
+    Info << "About to realloc arrays" << endl;
     if(cfdemCloud::reAllocArrays())
     {
-        Info <<"Foam::cfdemCloudIB::reAllocArrays()"<<endl;
-        dataExchangeM().allocateArray(angularVelocities_,0,3);
-        dataExchangeM().allocateArray(dragPrev_,0,3);
+        if (verbose_)
+        {
+            Info <<"Foam::cfdemCloudIB::reAllocArrays()"<<endl;
+        }
+
+        dataExchangeM().allocateArray(angularVelocities_, 0, 3);
+        dataExchangeM().allocateArray(DEMTorques_, 0, 3);
+        dataExchangeM().allocateArray(dragPrev_, 0, 3);
         return true;
     }
     return false;
@@ -143,6 +157,7 @@ bool Foam::cfdemCloudIB::evolve
                 impForces_[index][i] = 0;
                 expForces_[index][i] = 0;
                 DEMForces_[index][i] = 0;
+                DEMTorques_[index][i] = 0;
             }
         }
         for (int i=0;i<nrForceModels();i++) forceM(i).setForce();
@@ -234,6 +249,12 @@ void Foam::cfdemCloudIB::setParticleVelocity
         }
     }
     U.correctBoundaryConditions();
+}
+
+void Foam::cfdemCloudIB::setForces()
+{
+    resetArray(DEMTorques_, numberOfParticles(), 3);
+    cfdemCloud::setForces();
 }
 
 vector Foam::cfdemCloudIB::angularVelocity(int index)

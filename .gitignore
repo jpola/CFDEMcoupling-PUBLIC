@@ -3,4 +3,7 @@
 log_*
 log.*
 *~
-
+*.files
+*.config
+*.creator
+*.includes
